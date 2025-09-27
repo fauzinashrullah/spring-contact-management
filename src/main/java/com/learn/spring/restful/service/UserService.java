@@ -12,9 +12,6 @@ import com.learn.spring.restful.entity.User;
 import com.learn.spring.restful.model.RegisterUserRequest;
 import com.learn.spring.restful.repository.UserRepository;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,15 +19,12 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final Validator validator;
+    private final ValidationService validationService;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void register(RegisterUserRequest request){
-        Set<ConstraintViolation<RegisterUserRequest>> constraintViolations = validator.validate(request);
-        if (!constraintViolations.isEmpty()){
-            throw new ConstraintViolationException(constraintViolations);
-        }
+        validationService.validate(request);
 
         if (userRepository.existsById(request.getUsername())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already registered");
