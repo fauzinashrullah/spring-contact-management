@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.learn.spring.restful.entity.User;
 import com.learn.spring.restful.model.RegisterUserRequest;
+import com.learn.spring.restful.model.UserResponse;
 import com.learn.spring.restful.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -36,5 +37,9 @@ public class UserService {
         user.setName(request.getName());
 
         userRepository.save(user);
+    }
+
+    public UserResponse get(User user){
+        return new UserResponse(user.getUsername(), user.getName());
     }
 }
