@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learn.spring.restful.entity.User;
 import com.learn.spring.restful.model.RegisterUserRequest;
+import com.learn.spring.restful.model.UpdateUserRequest;
 import com.learn.spring.restful.model.UserResponse;
 import com.learn.spring.restful.model.WebResponse;
 import com.learn.spring.restful.repository.UserRepository;
@@ -185,6 +186,57 @@ class UserControllerTest {
             WebResponse<UserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
             assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void updateUserUnauthorized() throws Exception{
+        UpdateUserRequest request = new UpdateUserRequest();
+
+        mockMvc.perform(
+            patch("/api/users/current")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        ).andExpectAll(
+            status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<UserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void updateUserSuccess() throws Exception{
+        User user = new User();
+        user.setUsername("test");
+        user.setPassword(passwordEncoder.encode("password"));
+        user.setName("Test");
+        user.setToken("test");
+        user.setTokenExpiredAt(System.currentTimeMillis() + 1000000000L);
+        userRepository.save(user);
+
+        UpdateUserRequest request = new UpdateUserRequest();
+        request.setName("newName");
+        request.setPassword("newPassword");
+
+        mockMvc.perform(
+            patch("/api/users/current")
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-API-TOKEN", "test")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        ).andExpectAll(
+            status().isOk()
+        ).andDo(result -> {
+            WebResponse<UserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            User userDb = userRepository.findById(user.getUsername()).orElse(null);
+            assertNull(response.getErrors());
+            assertNotNull(userDb);
+            assertEquals("newName", userDb.getName());
+            assertTrue(passwordEncoder.matches(request.getPassword(), userDb.getPassword()));
         });
     }
 }

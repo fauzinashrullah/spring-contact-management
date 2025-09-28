@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.learn.spring.restful.entity.User;
 import com.learn.spring.restful.model.RegisterUserRequest;
+import com.learn.spring.restful.model.UpdateUserRequest;
 import com.learn.spring.restful.model.UserResponse;
 import com.learn.spring.restful.model.WebResponse;
 import com.learn.spring.restful.service.UserService;
@@ -12,6 +13,7 @@ import com.learn.spring.restful.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -34,4 +36,9 @@ public class UserController {
         return WebResponse.<UserResponse>builder().data(userResponse).build();
     }
     
+    @PatchMapping("/api/users/current")
+    public WebResponse<UserResponse> update(User user, @RequestBody UpdateUserRequest request){
+        UserResponse userResponse = userService.update(user, request);
+        return WebResponse.<UserResponse>builder().data(userResponse).build();
+    }
 }

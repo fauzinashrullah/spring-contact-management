@@ -1,5 +1,6 @@
 package com.learn.spring.restful.service;
 
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.learn.spring.restful.entity.User;
 import com.learn.spring.restful.model.RegisterUserRequest;
+import com.learn.spring.restful.model.UpdateUserRequest;
 import com.learn.spring.restful.model.UserResponse;
 import com.learn.spring.restful.repository.UserRepository;
 
@@ -40,6 +42,22 @@ public class UserService {
     }
 
     public UserResponse get(User user){
+        return new UserResponse(user.getUsername(), user.getName());
+    }
+
+    @Transactional
+    public UserResponse update(User user, UpdateUserRequest request){
+        validationService.validate(request);
+
+        if(Objects.nonNull(request.getName())){
+            user.setName(request.getName());
+        }
+
+        if(Objects.nonNull(request.getPassword())){
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        userRepository.save(user);
         return new UserResponse(user.getUsername(), user.getName());
     }
 }
