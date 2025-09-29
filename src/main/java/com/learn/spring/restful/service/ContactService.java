@@ -2,7 +2,9 @@ package com.learn.spring.restful.service;
 
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.learn.spring.restful.entity.Contact;
 import com.learn.spring.restful.entity.User;
@@ -34,6 +36,17 @@ public class ContactService {
 
         contactRepository.save(contact);
 
+        return toContactResponse(contact);
+    }
+
+    public ContactResponse get(User user, String id){
+        Contact contact = contactRepository.findFirstByUserAndId(user, id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
+        
+        return toContactResponse(contact);
+    }
+
+    private ContactResponse toContactResponse(Contact contact){
         return new ContactResponse(
             contact.getId(), 
             contact.getFirstname(), 

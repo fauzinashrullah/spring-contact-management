@@ -11,6 +11,10 @@ import com.learn.spring.restful.service.ContactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -23,6 +27,12 @@ public class ContactController {
     public WebResponse<ContactResponse> create(User user, @RequestBody CreateContactRequest request) {
         ContactResponse contactResponse = contactService.create(user, request);
         return WebResponse.<ContactResponse>builder().data(contactResponse).build();
+    }
+    
+    @GetMapping("/api/contacts/{contactId}")
+    public WebResponse<ContactResponse> get(User user, @PathVariable("contactId") String contactId) {
+        ContactResponse response = contactService.get(user, contactId);
+        return WebResponse.<ContactResponse>builder().data(response).build();
     }
     
 }
