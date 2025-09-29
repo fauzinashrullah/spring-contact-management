@@ -5,11 +5,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.learn.spring.restful.entity.User;
 import com.learn.spring.restful.model.ContactResponse;
 import com.learn.spring.restful.model.CreateContactRequest;
+import com.learn.spring.restful.model.UpdateContactRequest;
 import com.learn.spring.restful.model.WebResponse;
 import com.learn.spring.restful.service.ContactService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,4 +37,9 @@ public class ContactController {
         return WebResponse.<ContactResponse>builder().data(response).build();
     }
     
+   @PutMapping("/api/contacts/{contactId}")
+    public WebResponse<ContactResponse> update(User user, @RequestBody UpdateContactRequest request, @PathVariable String contactId) {
+        ContactResponse contactResponse = contactService.update(user, request, contactId);
+        return WebResponse.<ContactResponse>builder().data(contactResponse).build();
+    }
 }

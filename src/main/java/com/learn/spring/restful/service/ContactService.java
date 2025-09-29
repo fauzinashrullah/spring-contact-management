@@ -10,6 +10,7 @@ import com.learn.spring.restful.entity.Contact;
 import com.learn.spring.restful.entity.User;
 import com.learn.spring.restful.model.ContactResponse;
 import com.learn.spring.restful.model.CreateContactRequest;
+import com.learn.spring.restful.model.UpdateContactRequest;
 import com.learn.spring.restful.repository.ContactRepository;
 
 import jakarta.transaction.Transactional;
@@ -43,6 +44,21 @@ public class ContactService {
         Contact contact = contactRepository.findFirstByUserAndId(user, id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
         
+        return toContactResponse(contact);
+    }
+
+    public ContactResponse update(User user, UpdateContactRequest request, String contactId){
+        validationService.validate(request);
+
+        Contact contact = contactRepository.findFirstByUserAndId(user, contactId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
+        
+        contact.setFirstname(request.getFirstname());
+        contact.setLastname(request.getLastname());
+        contact.setEmail(request.getEmail());
+        contact.setPhone(request.getPhone());
+        contactRepository.save(contact);
+
         return toContactResponse(contact);
     }
 
